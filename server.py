@@ -1,13 +1,7 @@
 import socket
 
-HOST = "localhost"
-PORT = 5000
 
-
-def handle_data(output):
-    return (f"ok + {output}").encode("utf-8")
-
-def main(out_fun):
+def main(out_fun, HOST, PORT):
     end = "$EOM".encode("utf-8")
     close = "$CLOSE_ENTIRE_CONNECTION".encode("utf-8")
     def check_end(data: bytes):
@@ -50,4 +44,3 @@ def main(out_fun):
                     break
     print("exiting")
 
-main(handle_data)
