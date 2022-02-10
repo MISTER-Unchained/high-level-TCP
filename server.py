@@ -36,13 +36,14 @@ def main(out_fun):
                 output, data = check_end(data)
                 if output:
                     return_data = out_fun(output)
-                    if check_valid_message(return_data):
-                        if return_data.find(close) == -1:
-                            conn.sendall(return_data + end)
+                    if return_data != None:
+                        if check_valid_message(return_data):
+                            if return_data.find(close) == -1:
+                                conn.sendall(return_data + end)
+                            else:
+                                conn.sendall(return_data + end + close)
                         else:
-                            conn.sendall(return_data + end + close)
-                    else:
-                        raise("Contained invalid data")
+                            raise("Contained invalid data")
                 if data.find(close) != -1:
                     conn.sendall(close)
                     print("connection closed")

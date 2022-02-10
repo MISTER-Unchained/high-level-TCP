@@ -5,7 +5,6 @@ HOST = "localhost"
 PORT = 5000
 
 
-datatosend = bytes()
 
 global_socket = None
 
@@ -25,10 +24,9 @@ def check_end(data: bytes):
         return data[0:ind], data[ind+len(end):]
 
 def handle_data(output):
-    print(f"server returned with \"{output}\"")
+    return (f"ok + {output}").encode("utf-8")
 
-def connection_handler():
-    global datatosend
+def connection_handler(out_fun: function):
     global global_socket
     data = bytes()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -38,18 +36,22 @@ def connection_handler():
             data += s.recv(1024)
             output, data = check_end(data)
             if output:
-                handle_data(output.decode("utf-8"))
+                return_data = out_fun(output)
+                if return_data != None:
+                    if check_valid_message(return_data):
+                        if return_data.find(close) == -1:
+                            s.sendall(return_data + end)
+                        else:
+                            s.sendall(return_data + end + close)
+                    else:
+                        raise("Contained invalid data")
             if data.find(close) != -1:
                 s.sendall(close)
                 print("connection closed")
                 break
     print("exiting")
 
-th1 = th.Thread(target=connection_handler, daemon=True)
-th1.start()
-
 def get_input_loop():
-    global datatosend
     global global_socket
     while True:
         datatosend = input("enter command:").encode("utf-8")
